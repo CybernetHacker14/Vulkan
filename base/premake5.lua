@@ -16,7 +16,8 @@ project "Base"
     {
         "src",
         "../vendor/glfw/module/include",
-        "../vendor/glm/module"
+        "../vendor/glm/module",
+        "$(VULKAN_SDK)/include"
     }
 
     links
@@ -24,8 +25,19 @@ project "Base"
         "glfw"
     }
 
-    filter "system:Windows"
+    filter "system:windows"
         systemversion "latest"
+
+        defines
+        {
+            "WIN32_LEAN_AND_MEAN",
+            "_CRT_SECURE_NO_WARNINGS"
+        }
+
+        links
+        {
+            os.getenv("VK_SDK_PATH") .. "/Lib/vulkan-1.lib"
+        }
 
     filter "configurations:Debug"
         defines "VKB_DEBUG"
