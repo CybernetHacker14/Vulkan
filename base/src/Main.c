@@ -8,6 +8,16 @@
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 
+#ifdef VKB_DEBUG
+const short enableValidationLayers = 1;
+#else
+const short enableValidationLayers = 0;
+#endif // VKB_DEBUG
+
+const char* validationLayers[1] = {
+	"VK_LAYER_KHRONOS_validation"
+};
+
 GLFWwindow* window = NULL;
 VkInstance instance;
 
@@ -18,11 +28,15 @@ int validateglfwExtensions(unsigned int glfwExtensionCount, const char** glfwExt
 	VkExtensionProperties* vkExtensions = (VkExtensionProperties*)malloc(vkExtensionCount * sizeof(VkExtensionProperties));
 	vkEnumerateInstanceExtensionProperties(NULL, &vkExtensionCount, vkExtensions);
 
+	if (!vkExtensions) {
+		return 0;
+	}
+
 	int extensionsFound = 0;
 	for (int i = 0; i < vkExtensionCount; ++i) {
 
 		for (int j = 0; j < glfwExtensionCount; ++j) {
-			if (vkExtensions && strcmp(vkExtensions[i].extensionName, glfwExtensions[j]) == 0) {
+			if (strcmp(vkExtensions[i].extensionName, glfwExtensions[j]) == 0) {
 				extensionsFound++;
 			}
 		}
@@ -37,6 +51,38 @@ int validateglfwExtensions(unsigned int glfwExtensionCount, const char** glfwExt
 	return 1;
 }
 
+int checkValidationLayerSupport() {
+	unsigned int layerCount;
+	vkEnumerateInstanceLayerProperties(&layerCount, NULL);
+
+	VkLayerProperties* availableLayers = (VkLayerProperties*)malloc(layerCount * sizeof(VkLayerProperties));
+	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers);
+
+	if (!availableLayers) {
+		free(availableLayers);
+		return 0;
+	}
+
+	for (int i = 0; i < 1; ++i) {
+		short layerFound = 0;
+
+		for (int j = 0; j < layerCount; ++j) {
+			if (strcmp(availableLayers[j].layerName, validationLayers[i]) == 0) {
+				layerFound = 1;
+				break;
+			}
+		}
+
+		if (!layerFound) {
+			free(availableLayers);
+			return 0;
+		}
+	}
+
+	free(availableLayers);
+	return 1;
+}
+
 void createInstance() {
 	unsigned int glfwExtensionCount = 0;
 	const char** glfwExtensions;
@@ -45,6 +91,12 @@ void createInstance() {
 
 	if (!validateglfwExtensions(glfwExtensionCount, glfwExtensions)) {
 		printf("Extension validation error\n");
+		return;
+	}
+
+	if (enableValidationLayers && !checkValidationLayerSupport()) {
+		printf("Validation layers requested, but not available\n");
+		return;
 	}
 
 	VkApplicationInfo appInfo;
@@ -59,10 +111,12 @@ void createInstance() {
 	VkInstanceCreateInfo createInfo;
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pNext = NULL;
+	createInfo.flags = 0;
 	createInfo.pApplicationInfo = &appInfo;
 	createInfo.enabledExtensionCount = glfwExtensionCount;
 	createInfo.ppEnabledExtensionNames = glfwExtensions;
-	createInfo.enabledLayerCount = 0;
+	createInfo.enabledLayerCount = enableValidationLayers ? (unsigned int)1 : 0; // Not a bool, its a count. We have manually specified it as 1
+	createInfo.ppEnabledLayerNames = enableValidationLayers ? &validationLayers : NULL;
 
 	if (vkCreateInstance(&createInfo, NULL, &instance)) {
 		printf("Failed to create instance");
