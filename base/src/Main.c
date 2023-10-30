@@ -21,6 +21,16 @@ const char* validationLayers[1] = {
 GLFWwindow* window = NULL;
 VkInstance instance;
 
+void getRequiredExtensions(char** extensions, unsigned int count) {
+	unsigned int temp = 0;
+
+	for (int i = 0; i < (enableValidationLayers ? count - 1 : count); ++i)
+		extensions[i] = glfwGetRequiredInstanceExtensions(&temp)[i];
+
+	if (enableValidationLayers)
+		extensions[count - 1] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+}
+
 int validateglfwExtensions(unsigned int glfwExtensionCount, const char** glfwExtensions) {
 
 	unsigned int vkExtensionCount = 0;
@@ -53,6 +63,7 @@ int validateglfwExtensions(unsigned int glfwExtensionCount, const char** glfwExt
 
 int checkValidationLayerSupport() {
 	unsigned int layerCount;
+	int success = 0;
 	vkEnumerateInstanceLayerProperties(&layerCount, NULL);
 
 	VkLayerProperties* availableLayers = (VkLayerProperties*)malloc(layerCount * sizeof(VkLayerProperties));
@@ -83,13 +94,20 @@ int checkValidationLayerSupport() {
 	return 1;
 }
 
+
+
 void createInstance() {
-	unsigned int glfwExtensionCount = 0;
-	const char** glfwExtensions;
+	unsigned int extensionCount = 0;
+	char** extensions;
 
-	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	glfwGetRequiredInstanceExtensions(&extensionCount);
+	if (enableValidationLayers) ++extensionCount;
 
-	if (!validateglfwExtensions(glfwExtensionCount, glfwExtensions)) {
+	extensions = (char**)malloc(sizeof(char*) * extensionCount);
+
+	getRequiredExtensions(extensions, extensionCount);
+
+	if (!validateglfwExtensions(extensionCount, extensions)) {
 		printf("Extension validation error\n");
 		return;
 	}
@@ -113,8 +131,8 @@ void createInstance() {
 	createInfo.pNext = NULL;
 	createInfo.flags = 0;
 	createInfo.pApplicationInfo = &appInfo;
-	createInfo.enabledExtensionCount = glfwExtensionCount;
-	createInfo.ppEnabledExtensionNames = glfwExtensions;
+	createInfo.enabledExtensionCount = extensionCount;
+	createInfo.ppEnabledExtensionNames = extensions;
 	createInfo.enabledLayerCount = enableValidationLayers ? (unsigned int)1 : 0; // Not a bool, its a count. We have manually specified it as 1
 	createInfo.ppEnabledLayerNames = enableValidationLayers ? &validationLayers : NULL;
 
@@ -122,6 +140,8 @@ void createInstance() {
 		printf("Failed to create instance");
 		return;
 	}
+
+	free(extensions);
 }
 
 void initWindow() {
