@@ -20,6 +20,62 @@ const char* validationLayers[LAYERCOUNT] = {"VK_LAYER_KHRONOS_validation"};
 
 GLFWwindow* window = NULL;
 VkInstance instance;
+VkDebugUtilsMessengerEXT debugMessenger;
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+    void* pUserData) {
+    fprintf_s(stderr, "Validation layer: %s \n", pCallbackData->pMessage);
+
+    return VK_FALSE;
+}
+
+VkResult CreateDebugUtilsMessengerEXT(
+    VkInstance instance,
+    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pDebugMessenger) {
+    PFN_vkCreateDebugUtilsMessengerEXT func =
+        (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+
+    return func != NULL ? func(instance, pCreateInfo, pAllocator, pDebugMessenger) : VK_ERROR_EXTENSION_NOT_PRESENT;
+}
+
+void DestroyDebugUtilsMessengerEXT(
+    VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
+    PFN_vkDestroyDebugUtilsMessengerEXT func =
+        (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+
+    if (func != NULL) func(instance, debugMessenger, pAllocator);
+}
+
+void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo) {
+    createInfo->sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    createInfo->pNext = NULL;
+    createInfo->flags = 0;
+    createInfo->messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    createInfo->messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                              VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                              VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    createInfo->pfnUserCallback = debugCallback;
+    createInfo->pUserData = NULL;
+}
+
+void setupDebugMessenger() {
+    if (!enableValidationLayers) return;
+
+    VkDebugUtilsMessengerCreateInfoEXT createInfo;
+    populateDebugMessengerCreateInfo(&createInfo);
+
+    if (CreateDebugUtilsMessengerEXT(instance, &createInfo, NULL, &debugMessenger) != VK_SUCCESS) {
+        printf("Failed to setup debug messenger!\n");
+        return;
+    }
+}
 
 void getRequiredExtensions(char** extensions, unsigned int count) {
     unsigned int temp = 0;
@@ -119,10 +175,21 @@ void createInstance() {
     createInfo.pApplicationInfo = &appInfo;
     createInfo.enabledExtensionCount = extensionCount;
     createInfo.ppEnabledExtensionNames = extensions;
-    createInfo.enabledLayerCount = enableValidationLayers
-                                       ? (unsigned int)LAYERCOUNT
-                                       : 0;  // Not a bool, its a count. We have manually specified it as 1
-    createInfo.ppEnabledLayerNames = enableValidationLayers ? &validationLayers : NULL;
+
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+    if (enableValidationLayers) {
+        createInfo.enabledLayerCount = enableValidationLayers
+                                           ? (unsigned int)LAYERCOUNT
+                                           : 0;  // Not a bool, its a count. We have manually specified it as 1
+        createInfo.ppEnabledLayerNames = enableValidationLayers ? &validationLayers : NULL;
+
+        populateDebugMessengerCreateInfo(&debugCreateInfo);
+        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+
+    } else {
+        createInfo.enabledLayerCount = 0;
+        createInfo.pNext = NULL;
+    }
 
     if (vkCreateInstance(&createInfo, NULL, &instance)) {
         printf("Failed to create instance");
@@ -143,6 +210,7 @@ void initWindow() {
 
 void initVulkan() {
     createInstance();
+    setupDebugMessenger();
 }
 
 void mainLoop() {
@@ -150,6 +218,10 @@ void mainLoop() {
 }
 
 void cleanup() {
+    if (enableValidationLayers) DestroyDebugUtilsMessengerEXT(instance, debugMessenger, NULL);
+
+    vkDestroyInstance(instance, NULL);
+
     glfwDestroyWindow(window);
 
     glfwTerminate();
