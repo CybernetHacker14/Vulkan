@@ -10,9 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#define LAYERCOUNT 1
-const char* validationLayers[LAYERCOUNT] = {"VK_LAYER_KHRONOS_validation"};
-
 VkInstance instance;
 
 void getRequiredExtensions(char** extensions, unsigned int count) {

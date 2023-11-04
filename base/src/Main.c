@@ -2,6 +2,7 @@
 
 #include "Renderer/EntryPoint.h"
 #include "Renderer/DebugMessenger.h"
+#include "Renderer/Device.h"
 
 #include <stdio.h>
 
@@ -11,6 +12,8 @@ const unsigned int HEIGHT = 600;
 void initVulkan() {
     createInstance();
     createDebugMessenger();
+    pickPhysicalDevice();
+    createLogicalDevice();
 }
 
 void mainLoop() {
@@ -18,6 +21,7 @@ void mainLoop() {
 }
 
 void cleanup() {
+    destroyLogicalDevice();
     destroyDebugMessenger();
     destroyInstance();
 
