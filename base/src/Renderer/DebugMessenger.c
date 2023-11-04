@@ -9,16 +9,6 @@
 
 VkDebugUtilsMessengerEXT debugMessenger;
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    void* pUserData) {
-    fprintf_s(stderr, "Validation layer: %s \n", pCallbackData->pMessage);
-
-    return VK_FALSE;
-}
-
 VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance,
     const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
@@ -42,10 +32,10 @@ void createDebugMessenger() {
     if (!enableValidationLayers) return;
 
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
-    populateDebugMessengerCreateInfo(&createInfo, debugCallback);
+    populateDebugMessengerCreateInfo(&createInfo);
 
     if (CreateDebugUtilsMessengerEXT(getInstance(), &createInfo, NULL, &debugMessenger) != VK_SUCCESS) {
-        printf("Failed to setup debug messenger!\n");
+        printf_s("Failed to setup debug messenger!\n");
         return;
     }
 }

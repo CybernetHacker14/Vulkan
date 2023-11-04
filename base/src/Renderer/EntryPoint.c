@@ -15,16 +15,6 @@ const char* validationLayers[LAYERCOUNT] = {"VK_LAYER_KHRONOS_validation"};
 
 VkInstance instance;
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    void* pUserData) {
-    fprintf_s(stderr, "Validation layer: %s \n", pCallbackData->pMessage);
-
-    return VK_FALSE;
-}
-
 void getRequiredExtensions(char** extensions, unsigned int count) {
     unsigned int temp = 0;
 
@@ -98,12 +88,12 @@ void createInstance() {
     getRequiredExtensions(extensions, extensionCount);
 
     if (!validateglfwExtensions(extensionCount, extensions)) {
-        printf("Extension validation error\n");
+        printf_s("Extension validation error\n");
         return;
     }
 
     if (enableValidationLayers && !checkValidationLayerSupport()) {
-        printf("Validation layers requested, but not available\n");
+        printf_s("Validation layers requested, but not available\n");
         return;
     }
 
@@ -131,7 +121,7 @@ void createInstance() {
                                            : 0;  // Not a bool, its a count. We have manually specified it as 1
         createInfo.ppEnabledLayerNames = enableValidationLayers ? &validationLayers : NULL;
 
-        populateDebugMessengerCreateInfo(&debugCreateInfo, debugCallback);
+        populateDebugMessengerCreateInfo(&debugCreateInfo);
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
 
     } else {
@@ -140,7 +130,7 @@ void createInstance() {
     }
 
     if (vkCreateInstance(&createInfo, NULL, &instance)) {
-        printf("Failed to create instance");
+        printf_s("Failed to create instance");
         return;
     }
 

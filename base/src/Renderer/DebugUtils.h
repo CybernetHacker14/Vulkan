@@ -18,7 +18,6 @@ static const short enableValidationLayers = 0;
 
 // Right now, this should be used only internally
 
-void populateDebugMessengerCreateInfo(
-    VkDebugUtilsMessengerCreateInfoEXT* createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
+void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo);
 
 #endif  // !DEBUG_UTILS_H
