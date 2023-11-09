@@ -2,6 +2,8 @@
 #include "Renderer/EntryPoint.h"
 #include "Renderer/DebugUtils.h"
 
+#include "Window/Window.h"
+
 #include <vulkan/vulkan.h>
 
 #include <stdlib.h>
@@ -10,31 +12,49 @@
 VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 VkDevice device = VK_NULL_HANDLE;
 VkQueue graphicsQueue;
+VkQueue presentQueue;
+
+typedef struct optional_uint {
+    unsigned short flag;
+    unsigned int data;
+} optional;
 
 typedef struct QueueFamilyIndices {
-    union {
-        unsigned int graphicsFamily;
-        short nullValue;
-    } data;
+    optional graphicsFamily;
+    optional presentFamily;
 
 } QueueFamilyIndices;
 
 int isComplete(QueueFamilyIndices indices) {
-    return indices.data.nullValue == -1 ? 0 : 1;
+    return indices.graphicsFamily.flag == 1 && indices.presentFamily.flag == 1;
 }
 
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
-    QueueFamilyIndices indices = {.data.nullValue = -1};
+    QueueFamilyIndices indices = {
+        .graphicsFamily.data = 0, .graphicsFamily.flag = 0, .presentFamily.data = 0, .presentFamily.flag = 0};
 
     unsigned int queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, NULL);
 
     VkQueueFamilyProperties* queueFamilies =
         (VkQueueFamilyProperties*)malloc(queueFamilyCount * sizeof(VkQueueFamilyProperties));
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies);
 
     if (queueFamilies) {
         for (int i = 0; i < queueFamilyCount; ++i) {
-            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) indices.data.graphicsFamily = i;
+            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                indices.graphicsFamily.data = i;
+                indices.graphicsFamily.flag = 1;
+            }
+
+            VkBool32 presentSupport = 0;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, getSurface(), &presentSupport);
+
+            if (presentSupport) {
+                indices.presentFamily.data = i;
+                indices.presentFamily.flag = 1;
+            }
+
             if (isComplete(indices)) break;
         }
     }
@@ -82,15 +102,19 @@ void pickPhysicalDevice() {
 void createLogicalDevice() {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
-    VkDeviceQueueCreateInfo queueCreateInfo;
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.pNext = NULL;
-    queueCreateInfo.flags = 0;
-    queueCreateInfo.queueFamilyIndex = indices.data.graphicsFamily;
-    queueCreateInfo.queueCount = 1;
+    VkDeviceQueueCreateInfo queueCreateInfos[2];
+    unsigned int uniqueQueueFamilies[2] = {indices.graphicsFamily.data, indices.presentFamily.data};
 
     float queuePriority = 1.0f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    for (int i = 0; i < 2; ++i) {
+        queueCreateInfos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfos[i].pNext = NULL;
+        queueCreateInfos[i].flags = 0;
+        queueCreateInfos[i].queueFamilyIndex = uniqueQueueFamilies[i];
+        queueCreateInfos[i].queueCount = 1;
+        queueCreateInfos[i].pQueuePriorities = &queuePriority;
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures = {0};
 
@@ -98,8 +122,8 @@ void createLogicalDevice() {
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     createInfo.pNext = NULL;
     createInfo.flags = 0;
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.queueCreateInfoCount = 2;
+    createInfo.pQueueCreateInfos = queueCreateInfos;
     createInfo.pEnabledFeatures = &deviceFeatures;
     createInfo.enabledExtensionCount = 0;
     createInfo.ppEnabledExtensionNames = NULL;
@@ -119,7 +143,8 @@ void createLogicalDevice() {
         return;
     }
 
-    vkGetDeviceQueue(device, indices.data.graphicsFamily, 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.graphicsFamily.data, 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.presentFamily.data, 0, &presentQueue);
 }
 
 void destroyLogicalDevice() {

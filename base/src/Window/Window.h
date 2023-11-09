@@ -5,12 +5,20 @@
     #pragma once
 #endif  // _MSC_VER
 
+typedef struct VkSurfaceKHR_T* VkSurfaceKHR;
+
 void initWindow(const unsigned int width, const unsigned int height);
+
+void createSurface();
 
 int isWindowClosed();
 
 void onWindowUpdate();
 
+void destroySurface();
+
 void cleanupWindow();
+
+VkSurfaceKHR getSurface();
 
 #endif  // !WINDOW_H
