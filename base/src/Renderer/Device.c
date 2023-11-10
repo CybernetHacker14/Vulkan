@@ -42,9 +42,10 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
 
     if (queueFamilies) {
         for (int i = 0; i < queueFamilyCount; ++i) {
-            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT && !indices.graphicsFamily.flag) {
                 indices.graphicsFamily.data = i;
                 indices.graphicsFamily.flag = 1;
+                continue;
             }
 
             VkBool32 presentSupport = 0;
