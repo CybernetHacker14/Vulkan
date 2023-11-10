@@ -1,3 +1,5 @@
+include "clean.lua"
+
 workspace "Vulkan"
     architecture "x86_64"
     startproject "Base"
