@@ -15,7 +15,7 @@ workspace "Vulkan"
 
     outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-    include "base"
+    include "Base"
 
     group "Dependencies"
         include "vendor/glfw"

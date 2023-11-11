@@ -12,6 +12,7 @@ const unsigned int HEIGHT = 600;
 void initVulkan() {
     createInstance();
     createDebugMessenger();
+    createSurface();
     pickPhysicalDevice();
     createLogicalDevice();
 }
@@ -23,6 +24,7 @@ void mainLoop() {
 void cleanup() {
     destroyLogicalDevice();
     destroyDebugMessenger();
+    destroySurface();
     destroyInstance();
 
     cleanupWindow();
