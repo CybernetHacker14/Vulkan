@@ -18,8 +18,8 @@ static const short enableValidationLayers = 0;
 
 // Right now, this should be used only internally
 
-#define LAYERCOUNT 1
-static const char* validationLayers[LAYERCOUNT] = {"VK_LAYER_KHRONOS_validation"};
+#define DEBUG_LAYERCOUNT 1
+static const char* validationLayers[DEBUG_LAYERCOUNT] = {"VK_LAYER_KHRONOS_validation"};
 
 void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo);
 
