@@ -50,3 +50,7 @@ void cleanupWindow() {
 VkSurfaceKHR getSurface() {
     return surface;
 }
+
+void* getWindow() {
+    return window;
+}

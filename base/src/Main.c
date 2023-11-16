@@ -3,6 +3,7 @@
 #include "Renderer/EntryPoint.h"
 #include "Renderer/DebugMessenger.h"
 #include "Renderer/Device.h"
+#include "Renderer/Swapchain.h"
 
 #include <stdio.h>
 
@@ -15,6 +16,7 @@ void initVulkan() {
     createSurface();
     pickPhysicalDevice();
     createLogicalDevice();
+    createSwapchain();
 }
 
 void mainLoop() {
@@ -22,6 +24,7 @@ void mainLoop() {
 }
 
 void cleanup() {
+    destroySwapchain();
     destroyLogicalDevice();
     destroyDebugMessenger();
     destroySurface();

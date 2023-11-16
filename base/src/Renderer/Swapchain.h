@@ -7,9 +7,6 @@
 
 #include <vulkan/vulkan_core.h>
 
-typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
-typedef struct VkSurfaceKHR_T* VkSurfaceKHR;
-
 typedef struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
     unsigned int formatCount;
@@ -23,5 +20,7 @@ typedef struct SwapChainSupportDetails {
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 
 void createSwapchain();
+
+void destroySwapchain();
 
 #endif  // !SWAPCHAIN_H

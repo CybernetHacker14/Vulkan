@@ -20,17 +20,6 @@ VkDevice device = VK_NULL_HANDLE;
 VkQueue graphicsQueue;
 VkQueue presentQueue;
 
-typedef struct optional_uint {
-    unsigned short flag;
-    unsigned int data;
-} optional;
-
-typedef struct QueueFamilyIndices {
-    optional graphicsFamily;
-    optional presentFamily;
-
-} QueueFamilyIndices;
-
 int isComplete(QueueFamilyIndices indices) {
     return indices.graphicsFamily.flag == 1 && indices.presentFamily.flag == 1;
 }
@@ -60,7 +49,11 @@ int checkDeviceExtensionSupport(VkPhysicalDevice device) {
 
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
     QueueFamilyIndices indices = {
-        .graphicsFamily.data = 0, .graphicsFamily.flag = 0, .presentFamily.data = 0, .presentFamily.flag = 0};
+        .count = 0,
+        .graphicsFamily.data = 0,
+        .graphicsFamily.flag = 0,
+        .presentFamily.data = 0,
+        .presentFamily.flag = 0};
 
     unsigned int queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, NULL);
