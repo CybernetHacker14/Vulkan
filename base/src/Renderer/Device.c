@@ -2,36 +2,58 @@
 #include "Renderer/EntryPoint.h"
 #include "Renderer/DebugUtils.h"
 
+#include "Renderer/Swapchain.h"
+
 #include "Window/Window.h"
 
 #include <vulkan/vulkan.h>
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+#define DEVICE_EXTENSION_COUNT 1
+static const char* deviceExtensions[DEVICE_EXTENSION_COUNT] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 VkDevice device = VK_NULL_HANDLE;
 VkQueue graphicsQueue;
 VkQueue presentQueue;
 
-typedef struct optional_uint {
-    unsigned short flag;
-    unsigned int data;
-} optional;
-
-typedef struct QueueFamilyIndices {
-    optional graphicsFamily;
-    optional presentFamily;
-
-} QueueFamilyIndices;
-
 int isComplete(QueueFamilyIndices indices) {
     return indices.graphicsFamily.flag == 1 && indices.presentFamily.flag == 1;
 }
 
+int checkDeviceExtensionSupport(VkPhysicalDevice device) {
+    unsigned int extensionCount = 0;
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, NULL);
+
+    VkExtensionProperties* availableExtensions =
+        (VkExtensionProperties*)malloc(extensionCount * sizeof(VkExtensionProperties));
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, availableExtensions);
+
+    int detectedExtensionCount = 0;
+
+    if (availableExtensions) {
+        for (int i = 0; i < extensionCount; ++i) {
+            for (int j = 0; j < DEVICE_EXTENSION_COUNT; ++j) {
+                if (strcmp(availableExtensions[i].extensionName, deviceExtensions[j]) == 0) detectedExtensionCount++;
+            }
+        }
+    }
+
+    free(availableExtensions);
+
+    return detectedExtensionCount == DEVICE_EXTENSION_COUNT;
+}
+
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
     QueueFamilyIndices indices = {
-        .graphicsFamily.data = 0, .graphicsFamily.flag = 0, .presentFamily.data = 0, .presentFamily.flag = 0};
+        .count = 0,
+        .graphicsFamily.data = 0,
+        .graphicsFamily.flag = 0,
+        .presentFamily.data = 0,
+        .presentFamily.flag = 0};
 
     unsigned int queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, NULL);
@@ -67,7 +89,20 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
 
 int isDeviceSuitable(VkPhysicalDevice device) {
     QueueFamilyIndices indices = findQueueFamilies(device);
-    return isComplete(indices);
+
+    int extensionSupported = checkDeviceExtensionSupport(device);
+
+    int swapChainAdequate = 0;
+    if (extensionSupported) {
+        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, getSurface());
+        swapChainAdequate = (swapChainSupport.formatCount != 0) && (swapChainSupport.presentModeCount != 0) &&
+                            (swapChainSupport.formats != NULL) && (swapChainSupport.presentModes != NULL);
+
+        free(swapChainSupport.formats);
+        free(swapChainSupport.presentModes);
+    }
+
+    return isComplete(indices) && extensionSupported && swapChainAdequate;
 }
 
 void pickPhysicalDevice() {
@@ -126,11 +161,11 @@ void createLogicalDevice() {
     createInfo.queueCreateInfoCount = 2;
     createInfo.pQueueCreateInfos = queueCreateInfos;
     createInfo.pEnabledFeatures = &deviceFeatures;
-    createInfo.enabledExtensionCount = 0;
-    createInfo.ppEnabledExtensionNames = NULL;
+    createInfo.enabledExtensionCount = DEVICE_EXTENSION_COUNT;
+    createInfo.ppEnabledExtensionNames = deviceExtensions;
 
     if (enableValidationLayers) {
-        createInfo.enabledLayerCount = LAYERCOUNT;
+        createInfo.enabledLayerCount = DEBUG_LAYERCOUNT;
         createInfo.ppEnabledLayerNames = validationLayers;
 
     } else {

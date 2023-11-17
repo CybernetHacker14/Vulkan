@@ -21,4 +21,6 @@ void cleanupWindow();
 
 VkSurfaceKHR getSurface();
 
+void* getWindow();
+
 #endif  // !WINDOW_H

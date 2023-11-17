@@ -5,9 +5,19 @@
     #pragma once
 #endif  // _MSC_VER
 
+#include <Renderer/Common.h>
+
 typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
 typedef struct VkDevice_T* VkDevice;
 typedef struct VkQueue_T* VkQueue;
+
+typedef struct QueueFamilyIndices {
+    unsigned int count;
+    optional graphicsFamily;
+    optional presentFamily;
+} QueueFamilyIndices;
+
+QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
 void pickPhysicalDevice();
 

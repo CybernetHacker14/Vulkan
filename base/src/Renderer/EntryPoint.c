@@ -15,7 +15,7 @@ VkInstance instance;
 void getRequiredExtensions(char** extensions, unsigned int count) {
     unsigned int temp = 0;
 
-    for (int i = 0; i < (enableValidationLayers ? count - LAYERCOUNT : count); ++i)
+    for (int i = 0; i < (enableValidationLayers ? count - DEBUG_LAYERCOUNT : count); ++i)
         extensions[i] = glfwGetRequiredInstanceExtensions(&temp)[i];
 
     if (enableValidationLayers) extensions[count - 1] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
@@ -51,7 +51,7 @@ int checkValidationLayerSupport() {
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers);
 
     if (availableLayers) {
-        for (int i = 0; i < LAYERCOUNT; ++i) {
+        for (int i = 0; i < DEBUG_LAYERCOUNT; ++i) {
             short layerFound = 0;
 
             for (int j = 0; j < layerCount; ++j) {
@@ -114,7 +114,7 @@ void createInstance() {
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
     if (enableValidationLayers) {
         createInfo.enabledLayerCount = enableValidationLayers
-                                           ? (unsigned int)LAYERCOUNT
+                                           ? (unsigned int)DEBUG_LAYERCOUNT
                                            : 0;  // Not a bool, its a count. We have manually specified it as 1
         createInfo.ppEnabledLayerNames = enableValidationLayers ? &validationLayers : NULL;
 
