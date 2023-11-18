@@ -21,6 +21,10 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurface
 
 void createSwapchain();
 
+void createImageViews();
+
+void destroyImageViews();
+
 void destroySwapchain();
 
 #endif  // !SWAPCHAIN_H
