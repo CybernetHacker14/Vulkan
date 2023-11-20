@@ -17,6 +17,7 @@ void initVulkan() {
     pickPhysicalDevice();
     createLogicalDevice();
     createSwapchain();
+    createImageViews();
 }
 
 void mainLoop() {
@@ -24,6 +25,7 @@ void mainLoop() {
 }
 
 void cleanup() {
+    destroyImageViews();
     destroySwapchain();
     destroyLogicalDevice();
     destroyDebugMessenger();
