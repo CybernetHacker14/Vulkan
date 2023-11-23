@@ -9,7 +9,9 @@ project "Base"
     files
     {
         "src/**.h",
-        "src/**.c"
+        "src/**.c",
+        "shaders/**.vert",
+        "shaders/**.frag"
     }
 
     includedirs
@@ -48,3 +50,9 @@ project "Base"
         defines "VKB_RELEASE"
         runtime "Release"
         optimize "on"
+
+    filter "files:**vert"
+        flags "ExcludeFromBuild"
+
+    filter "files:**frag"
+        flags "ExcludeFromBuild"
