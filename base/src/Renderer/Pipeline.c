@@ -125,5 +125,5 @@ void createPipeline() {
 }
 
 void destroyPipeline() {
-    vkDestroyPipeline(getLogicalDevice(), pipelineLayout, NULL);
+    vkDestroyPipelineLayout(getLogicalDevice(), pipelineLayout, NULL);
 }
