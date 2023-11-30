@@ -7,6 +7,7 @@
 
 #include "Renderer/Shader.h"
 #include "Renderer/Pipeline.h"
+#include "Renderer/RenderPass.h"
 
 #include <stdio.h>
 
@@ -34,11 +35,13 @@ void destroyDeviceSetup() {
 
 void createGraphicsPipeline() {
     createShaderModules("shaders/shader_base/shader_base_vert.spv", "shaders/shader_base/shader_base_frag.spv");
+    createRenderPass();
     createPipeline();
 }
 
 void destroyGraphicsPipeline() {
     destroyPipeline();
+    destroyRenderPass();
     destroyShaderModules();
 }
 

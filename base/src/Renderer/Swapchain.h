@@ -19,6 +19,8 @@ typedef struct SwapChainSupportDetails {
 // because we are allocating it on heap using malloc
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 
+VkFormat getSwapchainImageFormat();
+
 void createSwapchain();
 
 void createImageViews();

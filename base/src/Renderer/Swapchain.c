@@ -44,6 +44,10 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurface
     return details;
 }
 
+VkFormat getSwapchainImageFormat() {
+    return swapChainImageFormat;
+}
+
 VkSurfaceFormatKHR chooseSwapSurfaceFormat(unsigned int formatCount, VkSurfaceFormatKHR* availableFormats) {
     for (int i = 0; i < formatCount; ++i) {
         if (availableFormats[i].format == VK_FORMAT_B8G8R8A8_SRGB &&
