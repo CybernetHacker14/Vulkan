@@ -1,11 +1,13 @@
 #include "Renderer/Pipeline.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Device.h"
+#include "Renderer/RenderPass.h"
 
 #include <vulkan/vulkan.h>
 #include <stdio.h>
 
 VkPipelineLayout pipelineLayout;
+VkPipeline graphicsPipeline;
 
 void createPipeline() {
     VkPipelineShaderStageCreateInfo vertShaderStageInfo;
@@ -122,8 +124,34 @@ void createPipeline() {
     if (vkCreatePipelineLayout(getLogicalDevice(), &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS) {
         printf_s("Failed to create pipeline layout!\n");
     }
+
+    VkGraphicsPipelineCreateInfo pipelineInfo;
+    pipelineInfo.pNext = NULL;
+    pipelineInfo.flags = 0;
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = 2;
+    pipelineInfo.pStages = shaderStages;
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &inputAssembly;
+    pipelineInfo.pViewportState = &viewportState;
+    pipelineInfo.pRasterizationState = &rasterizer;
+    pipelineInfo.pMultisampleState = &multisampling;
+    pipelineInfo.pDepthStencilState = NULL;
+    pipelineInfo.pColorBlendState = &colorBlending;
+    pipelineInfo.pDynamicState = &dynamicState;
+    pipelineInfo.layout = pipelineLayout;
+    pipelineInfo.renderPass = getRenderPass();
+    pipelineInfo.subpass = 0;
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    pipelineInfo.basePipelineIndex = -1;
+
+    if (vkCreateGraphicsPipelines(getLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &graphicsPipeline) !=
+        VK_SUCCESS) {
+        printf_s("Failed to create graphics pipeline!\n");
+    }
 }
 
 void destroyPipeline() {
+    vkDestroyPipeline(getLogicalDevice(), graphicsPipeline, NULL);
     vkDestroyPipelineLayout(getLogicalDevice(), pipelineLayout, NULL);
 }

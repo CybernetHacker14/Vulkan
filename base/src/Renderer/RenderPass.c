@@ -54,3 +54,7 @@ void createRenderPass() {
 void destroyRenderPass() {
     vkDestroyRenderPass(getLogicalDevice(), renderPass, NULL);
 }
+
+VkRenderPass getRenderPass() {
+    return renderPass;
+}
