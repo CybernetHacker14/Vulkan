@@ -48,6 +48,18 @@ VkFormat getSwapchainImageFormat() {
     return swapChainImageFormat;
 }
 
+unsigned int getSwapchainImageCount() {
+    return swapChainImageCount;
+}
+
+VkImageView* getSwapchainImageViews() {
+    return swapChainImageViews;
+}
+
+VkExtent2D getSwapchainExtent() {
+    return swapChainExtent;
+}
+
 VkSurfaceFormatKHR chooseSwapSurfaceFormat(unsigned int formatCount, VkSurfaceFormatKHR* availableFormats) {
     for (int i = 0; i < formatCount; ++i) {
         if (availableFormats[i].format == VK_FORMAT_B8G8R8A8_SRGB &&

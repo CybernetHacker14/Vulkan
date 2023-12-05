@@ -21,6 +21,12 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurface
 
 VkFormat getSwapchainImageFormat();
 
+unsigned int getSwapchainImageCount();
+
+VkImageView* getSwapchainImageViews();
+
+VkExtent2D getSwapchainExtent();
+
 void createSwapchain();
 
 void createImageViews();
