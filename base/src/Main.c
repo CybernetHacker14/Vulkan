@@ -9,6 +9,8 @@
 #include "Renderer/Pipeline.h"
 #include "Renderer/RenderPass.h"
 
+#include "Renderer/Framebuffer.h"
+
 #include <stdio.h>
 
 const unsigned int WIDTH = 800;
@@ -48,6 +50,7 @@ void destroyGraphicsPipeline() {
 void initVulkan() {
     createDeviceSetup();
     createGraphicsPipeline();
+    createFramebuffers();
 }
 
 void mainLoop() {
@@ -55,6 +58,7 @@ void mainLoop() {
 }
 
 void cleanup() {
+    destroyFramebuffers();
     destroyGraphicsPipeline();
     destroyDeviceSetup();
     cleanupWindow();
