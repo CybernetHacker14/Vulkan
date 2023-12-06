@@ -155,3 +155,7 @@ void destroyPipeline() {
     vkDestroyPipeline(getLogicalDevice(), graphicsPipeline, NULL);
     vkDestroyPipelineLayout(getLogicalDevice(), pipelineLayout, NULL);
 }
+
+VkPipeline getPipeline() {
+    return graphicsPipeline;
+}
