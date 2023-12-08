@@ -10,6 +10,7 @@
 #include "Renderer/RenderPass.h"
 
 #include "Renderer/Framebuffer.h"
+#include "Renderer/CommandPool.h"
 
 #include <stdio.h>
 
@@ -51,6 +52,7 @@ void initVulkan() {
     createDeviceSetup();
     createGraphicsPipeline();
     createFramebuffers();
+    createCommandPool();
 }
 
 void mainLoop() {
@@ -58,6 +60,7 @@ void mainLoop() {
 }
 
 void cleanup() {
+    destroyCommandPool();
     destroyFramebuffers();
     destroyGraphicsPipeline();
     destroyDeviceSetup();

@@ -46,3 +46,7 @@ void destroyFramebuffers() {
 
     free(swapChainFramebuffers);
 }
+
+VkFramebuffer* getSwapChainFramebuffers() {
+    return swapChainFramebuffers;
+}
