@@ -13,6 +13,8 @@ void createSurface();
 
 int isWindowClosed();
 
+int isWindowMinimized();
+
 void onWindowUpdate();
 
 void destroySurface();

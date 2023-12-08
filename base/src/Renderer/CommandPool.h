@@ -5,6 +5,12 @@
     #pragma once
 #endif  // _MSC_VER
 
+typedef struct VkCommandBuffer_T* VkCommandBuffer;
+
+void recordCommandBuffer(unsigned int imageIndex);
+
+VkCommandBuffer getCommandBuffer();
+
 void createCommandPool();
 
 void createCommandBuffer();
