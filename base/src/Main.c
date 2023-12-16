@@ -12,6 +12,8 @@
 #include "Renderer/Framebuffer.h"
 #include "Renderer/CommandPool.h"
 
+#include "Renderer/RenderOperations.h"
+
 #include <stdio.h>
 
 const unsigned int WIDTH = 800;
@@ -53,13 +55,21 @@ void initVulkan() {
     createGraphicsPipeline();
     createFramebuffers();
     createCommandPool();
+    createCommandBuffer();
+    createSyncObjects();
 }
 
 void mainLoop() {
-    while (!isWindowClosed()) { onWindowUpdate(); }
+    while (!isWindowClosed()) {
+        onWindowUpdate();
+        if (!isWindowMinimized()) drawFrame();
+    }
+
+    waitBeforeExiting();
 }
 
 void cleanup() {
+    destroySyncObjects();
     destroyCommandPool();
     destroyFramebuffers();
     destroyGraphicsPipeline();

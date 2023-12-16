@@ -34,6 +34,10 @@ int isWindowClosed() {
     return glfwWindowShouldClose(window);
 }
 
+int isWindowMinimized() {
+    return glfwGetWindowAttrib(window, GLFW_ICONIFIED);
+}
+
 void onWindowUpdate() {
     glfwPollEvents();
 }

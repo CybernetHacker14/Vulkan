@@ -12,7 +12,7 @@
 VkCommandPool commandPool;
 VkCommandBuffer commandBuffer;
 
-void recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int imageIndex) {
+void recordCommandBuffer(unsigned int imageIndex) {
     VkCommandBufferBeginInfo beginInfo;
     beginInfo.pNext = NULL;
     beginInfo.flags = 0;
@@ -63,6 +63,10 @@ void recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int imageIndex)
         printf_s("Failed to record command buffer!\n");
         return;
     }
+}
+
+VkCommandBuffer getCommandBuffer() {
+    return commandBuffer;
 }
 
 void createCommandPool() {

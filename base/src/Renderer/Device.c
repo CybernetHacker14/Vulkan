@@ -198,3 +198,7 @@ VkDevice getLogicalDevice() {
 VkQueue getGraphicsQueue() {
     return graphicsQueue;
 }
+
+VkQueue getPresentQueue() {
+    return presentQueue;
+}

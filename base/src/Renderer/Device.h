@@ -31,4 +31,6 @@ VkDevice getLogicalDevice();
 
 VkQueue getGraphicsQueue();
 
+VkQueue getPresentQueue();
+
 #endif  // !DEVICE_H

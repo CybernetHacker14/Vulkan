@@ -27,6 +27,8 @@ VkImageView* getSwapchainImageViews();
 
 VkExtent2D getSwapchainExtent();
 
+VkSwapchainKHR getSwapchain();
+
 void createSwapchain();
 
 void createImageViews();
